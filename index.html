@@ -270,14 +270,14 @@
     let tcoChart;
 
     function formatCurrency(num) {
-        return "&#8377; " + Math.round(num).toLocaleString('en-IN');
+        return "₹ " + Math.round(num).toLocaleString('en-IN');
     }
 
     function loadEV() {
         const selected = document.getElementById('evSelector').value;
         const data = evDatabase[selected];
         
-        document.getElementById('evNameHeader').innerText = "&#9889; EV Settings (" + data.name + ")";
+        document.getElementById('evNameHeader').innerHTML = "⚡ EV Settings (" + data.name + ")";
         document.getElementById('evOnRoad').value = data.onRoad;
         document.getElementById('evRange').value = data.range;
         document.getElementById('evKwh').value = data.kwh;
@@ -287,9 +287,9 @@
         
         const badgeContainer = document.getElementById('evSpecsContainer');
         badgeContainer.innerHTML = `
-            <div class="specs-badge">&#128734; Motor: ${data.motor}</div>
-            <div class="specs-badge">&#128267; Battery: ${data.battery}</div>
-            <div class="specs-badge">&#127950;&#65039; Max Speed: ${data.topSpeed}</div>
+            <div class="specs-badge">🚗 Motor: ${data.motor}</div>
+            <div class="specs-badge">🔋 Battery: ${data.battery}</div>
+            <div class="specs-badge">🏎️ Max Speed: ${data.topSpeed}</div>
         `;
         calculate();
     }
@@ -402,7 +402,7 @@
                     { label: 'Yamaha RayZR TCO', data: petrolData, borderColor: '#2962ff', backgroundColor: 'transparent', borderWidth: 3, borderDash: [5, 5], tension: 0.1 }
                 ]
             },
-            options: { responsive: true, maintainAspectRatio: false, scales: { y: { ticks: { callback: function(value) { return '&#8377; ' + (value/1000) + 'k'; } } } } }
+            options: { responsive: true, maintainAspectRatio: false, scales: { y: { ticks: { callback: function(value) { return '₹ ' + (value/1000) + 'k'; } } } } }
         });
     }
 
