@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart 14-Year EV vs Petrol TCO Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --bg-color: #f4f7f6;
+            --card-bg: #ffffff;
+            --text-main: #333333;
+            --text-muted: #666666;
+            --ev-color: #00c853;
+            --petrol-color: #2962ff;
+            --border-color: #e0e0e0;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: var(--bg-color); color: var(--text-main); padding: 20px; line-height: 1.6; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        header { text-align: center; margin-bottom: 30px; padding: 20px; background: var(--card-bg); border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        h1 { color: #1a1a1a; font-size: 26px; margin-bottom: 5px; }
+        p.subtitle { color: var(--text-muted); font-size: 14px; }
+        
+        .vehicle-selector { text-align: center; margin-bottom: 20px; }
+        .vehicle-selector select { padding: 10px 20px; font-size: 16px; border-radius: 8px; border: 1px solid var(--border-color); cursor: pointer; background: #fff;}
+
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
+        .card { background: var(--card-bg); padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .card h2 { font-size: 18px; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid var(--border-color); }
+        
+        .ev-header { color: var(--ev-color); }
+        .petrol-header { color: var(--petrol-color); }
+        
+        .specs-badge-container { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 15px;}
+        .specs-badge { font-size: 12px; background: #f0f0f0; padding: 4px 8px; border-radius: 4px; font-weight: 500; border: 1px solid #ccc; color: #444;}
+        
+        .itemized-section { background: #f9f9f9; padding: 12px; border-radius: 8px; margin-bottom: 15px; border: 1px dashed var(--border-color); }
+        .itemized-title { font-size: 13px; font-weight: bold; color: var(--text-muted); margin-bottom: 8px; text-transform: uppercase; }
+        .input-container { margin-bottom: 12px; }
+        .input-group { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+        .input-group label { font-size: 14px; font-weight: 500; flex: 1; }
+        .input-wrapper { display: flex; align-items: center; gap: 5px; }
+        .input-group input { width: 100px; padding: 6px 10px; border: 1px solid var(--border-color); border-radius: 6px; text-align: right; font-size: 14px; }
+        
+        .summary-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 20px; }
+        .stat-card { background: var(--card-bg); padding: 15px; border-radius: 12px; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .stat-card h3 { font-size: 11px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 5px; }
+        .stat-card .value { font-size: 22px; font-weight: bold; }
+        
+        .chart-container { background: var(--card-bg); padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 20px; height: 450px; }
+        
+        table { width: 100%; border-collapse: collapse; background: var(--card-bg); border-radius: 12px; overflow: hidden; }
+        th, td { padding: 12px 15px; text-align: right; border-bottom: 1px solid var(--border-color); font-size: 13px; }
+        th:first-child, td:first-child { text-align: left; }
+        th { background-color: #f8f9fa; color: var(--text-main); }
+        
+        .warranty-in { color: #155724; background-color: #d4edda; border: 1px solid #c3e6cb; padding: 2px 4px; border-radius: 4px; font-size: 11px; font-weight: bold; display: inline-block;}
+        .warranty-out { color: #721c24; background-color: #f8d7da; border: 1px solid #f5c6cb; padding: 2px 4px; border-radius: 4px; font-size: 11px; font-weight: bold; display: inline-block;}
+        
+        @media (max-width: 768px) { .grid, .summary-grid { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>Smart Multi-Vehicle TCO Calculator (Up to 14 Years)</h1>
+        <p class="subtitle">Accurate multi-lifecycle tracking mapping custom EV warranties vs standard petrol coverage parameters.</p>
+    </header>
+    
+    <div class="vehicle-selector">
+        <label style="font-weight: bold; margin-right: 10px;">Select Electric Vehicle to Compare:</label>
+        <select id="evSelector" onchange="loadEV()">
+            <option value="rizta">Ather Rizta Z (3.7 kWh + Extended Warranty)</option>
+            <option value="ather450x">Ather 450X (Pro Pack & Ext. Warranty)</option>
+            <option value="chetak">Bajaj Chetak (C3501)</option>
+            <option value="vida">VIDA V2 (Pro)</option>
+            <option value="nexus">Ampere Nexus (ST)</option>
+            <option value="orbiter">TVS Orbiter (V2)</option>
+            <option value="iqube">TVS iQube (ST 5.3 kWh)</option>
+        </select>
+    </div>
+
+    <div class="summary-grid">
+        <div class="stat-card">
+            <h3>Net Lifetime Savings</h3>
+            <div class="value" id="valNetSavings" style="color: var(--ev-color);">â‚¹0</div>
+        </div>
+        <div class="stat-card">
+            <h3>Break-Even Point</h3>
+            <div class="value" id="valBreakEven">0 Years</div>
+        </div>
+        <div class="stat-card">
+            <h3>Total EV Outlay</h3>
+            <div class="value" id="valTotalEV" style="color: var(--ev-color);">â‚¹0</div>
+        </div>
+        <div class="stat-card">
+            <h3>Total Petrol Outlay</h3>
+            <div class="value" id="valTotalPetrol" style="color: var(--petrol-color);">â‚¹0</div>
+        </div>
+    </div>
+
+    <div class="grid">
+        <!-- EV CARD -->
+        <div class="card">
+            <h2 class="ev-header" id="evNameHeader">âš¡ EV Settings</h2>
+            <div class="specs-badge-container" id="evSpecsContainer"></div>
+            
+            <div class="itemized-section">
+                <div class="itemized-title">Total On-Road Cost (â‚¹)</div>
+                <div class="input-container"><div class="input-group"><label>Final On-Road Price</label><div class="input-wrapper"><input type="number" id="evOnRoad" oninput="calculate()"></div></div></div>
+            </div>
+            
+            <div class="itemized-section">
+                <div class="itemized-title">Running Specs & Power</div>
+                <div class="input-container"><div class="input-group"><label>Real City Range (km)</label><div class="input-wrapper"><input type="number" id="evRange" oninput="calculate()"></div></div></div>
+                <div class="input-container"><div class="input-group"><label>Energy / Charge (kWh)</label><div class="input-wrapper"><input type="number" id="evKwh" step="0.1" oninput="calculate()"></div></div></div>
+                <div class="input-container"><div class="input-group"><label>Electricity Rate (â‚¹/kWh)</label><div class="input-wrapper"><input type="number" id="elecPrice" value="8" step="0.1" oninput="calculate()"></div></div></div>
+                <div class="input-container"><div class="input-group"><label>Yearly Base Maint. (â‚¹)</label><div class="input-wrapper"><input type="number" id="evMaint" value="3500" oninput="calculate()"></div></div></div>
+            </div>
+            
+            <div class="itemized-section">
+                <div class="itemized-title">Warranty & Battery Lifecycles</div>
+                <div class="input-container"><div class="input-group"><label>Extended Warranty (Years)</label><div class="input-wrapper"><input type="number" id="evWarYears" oninput="calculate()"></div></div></div>
+                <div class="input-container"><div class="input-group"><label>Extended Warranty (km)</label><div class="input-wrapper"><input type="number" id="evWarKm" oninput="calculate()"></div></div></div>
+                <div class="input-container"><div class="input-group"><label>New Battery Cost (â‚¹)</label><div class="input-wrapper"><input type="number" id="battCost" oninput="calculate()"></div></div></div>
+            </div>
+        </div>
+
+        <!-- PETROL CARD -->
+        <div class="card">
+            <h2 class="petrol-header">â›½ Petrol Settings (Yamaha RayZR)</h2>
+            <div class="itemized-section">
+                <div class="itemized-title">Total On-Road Cost (â‚¹)</div>
+                <div class="input-container"><div class="input-group"><label>Final On-Road Price</label><div class="input-wrapper"><input type="number" id="petrolOnRoad" value="107437" oninput="calculate()"></div></div></div>
+            </div>
+            <div class="itemized-section">
+                <div class="itemized-title">Running & Fluid Maintenance</div>
+                <div class="input-container"><div class="input-group"><label>Real City Mileage (kmpl)</label><div class="input-wrapper"><input type="number" id="petrolMileage" value="50" oninput="calculate()"></div></div></div>
+                <div class="input-container"><div class="input-group"><label>Petrol Price (â‚¹/L)</label><div class="input-wrapper"><input type="number" id="petrolCostLtr" value="105" oninput="calculate()"></div></div></div>
+                <div class="input-container"><div class="input-group"><label>Oil Change Interval (km)</label><div class="input-wrapper"><input type="number" id="oilInterval" value="2500" oninput="calculate()"></div></div></div>
+                <div class="input-container"><div class="input-group"><label>Cost per Oil Change (â‚¹)</label><div class="input-wrapper"><input type="number" id="oilCost" value="450" oninput="calculate()"></div></div></div>
+                <div class="input-container"><div class="input-group"><label>Other Maint. / Year (â‚¹)</label><div class="input-wrapper"><input type="number" id="petrolMaint" value="4000" oninput="calculate()"></div></div></div>
+            </div>
+            <div class="itemized-section">
+                <div class="itemized-title">Petrol Warranty Rules</div>
+                <div class="input-container"><div class="input-group"><label>Yamaha Max Warranty (Years)</label><div class="input-wrapper"><input type="number" id="petWarYears" value="5" oninput="calculate()"></div></div></div>
+                <div class="input-container"><div class="input-group"><label>Yamaha Max Warranty (km)</label><div class="input-wrapper"><input type="number" id="petWarKm" value="50000" oninput="calculate()"></div></div></div>
+            </div>
+            <div class="itemized-section" style="background:#e8f4fd;">
+                <div class="itemized-title">Scope Settings</div>
+                <div class="input-container"><div class="input-group"><label>Daily Commute (km)</label><div class="input-wrapper"><input type="number" id="dailyKm" value="50" oninput="calculate()"></div></div></div>
+                <div class="input-container"><div class="input-group"><label>Max Study Horizon (Years)</label><div class="input-wrapper"><input type="number" id="years" value="14" oninput="calculate()"></div></div></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="chart-container">
+        <canvas id="tcoChart"></canvas>
+    </div>
+
+    <div style="overflow-x: auto;">
+        <table>
+            <thead>
+                <tr>
+                    <th>Year</th>
+                    <th>Odometer</th>
+                    <th>EV Warranty Status</th>
+                    <th>RayZR Warranty Status</th>
+                    <th>EV Cumulative Spend</th>
+                    <th>RayZR Cumulative Spend</th>
+                    <th>Net Financial Status</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody"></tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    const evDatabase = {
+        rizta: {
+            name: "Ather Rizta Z",
+            onRoad: 189063, // Corrected direct itemization from customer quote
+            range: 115, // Real-world city adjusted from 159km IDC
+            kwh: 4.5,
+            warYears: 8, // With extended 8-year protection add-on
+            warKm: 80000,
+            battCost: 80000,
+            motor: "PMSM Mid-Drive (4.3 kW Peak)",
+            battery: "3.7 kWh",
+            topSpeed: "80 kmph"
+        },
+        ather450x: {
+            name: "Ather 450X (Pro Pack)",
+            onRoad: 196826,
+            range: 110,
+            kwh: 4.5,
+            warYears: 8,
+            warKm: 80000,
+            battCost: 80000,
+            motor: "PMSM Mid-Drive (6.4 kW Peak)",
+            battery: "3.7 kWh",
+            topSpeed: "90 kmph"
+        },
+        chetak: {
+            name: "Bajaj Chetak (C3501)",
+            onRoad: 150570,
+            range: 100,
+            kwh: 3.5,
+            warYears: 3,
+            warKm: 50000,
+            battCost: 65000,
+            motor: "BLDC Motor (4.2 kW Peak)",
+            battery: "3.0 kWh",
+            topSpeed: "73 kmph"
+        },
+        vida: {
+            name: "VIDA V2 (Pro)",
+            onRoad: 147881,
+            range: 110,
+            kwh: 4.0,
+            warYears: 5,
+            warKm: 50000,
+            battCost: 70000,
+            motor: "PMSM Motor (6 kW Peak)",
+            battery: "3.44 kWh",
+            topSpeed: "90 kmph"
+        },
+        nexus: {
+            name: "Ampere Nexus (ST)",
+            onRoad: 139642,
+            range: 100,
+            kwh: 3.5,
+            warYears: 5,
+            warKm: 75000,
+            battCost: 60000,
+            motor: "Mid-Mount Motor (4 kW Peak)",
+            battery: "3 kWh LFP",
+            topSpeed: "93 kmph"
+        },
+        orbiter: {
+            name: "TVS Orbiter (V2)",
+            onRoad: 120976,
+            range: 120,
+            kwh: 3.6,
+            warYears: 3,
+            warKm: 50000,
+            battCost: 65000,
+            motor: "BLDC Hub Motor (2.5 kW Peak)",
+            battery: "3.1 kWh",
+            topSpeed: "68 kmph"
+        },
+        iqube: {
+            name: "TVS iQube (ST 5.3 kWh)",
+            onRoad: 183436,
+            range: 150,
+            kwh: 6.0,
+            warYears: 3,
+            warKm: 50000,
+            battCost: 95000,
+            motor: "BLDC Hub Motor (4.4 kW Peak)",
+            battery: "5.3 kWh",
+            topSpeed: "82 kmph"
+        }
+    };
+
+    let tcoChart;
+
+    function formatCurrency(num) {
+        return "â‚¹ " + Math.round(num).toLocaleString('en-IN');
+    }
+
+    function loadEV() {
+        const selected = document.getElementById('evSelector').value;
+        const data = evDatabase[selected];
+        
+        document.getElementById('evNameHeader').innerText = "âš¡ EV Settings (" + data.name + ")";
+        document.getElementById('evOnRoad').value = data.onRoad;
+        document.getElementById('evRange').value = data.range;
+        document.getElementById('evKwh').value = data.kwh;
+        document.getElementById('evWarYears').value = data.warYears;
+        document.getElementById('evWarKm').value = data.warKm;
+        document.getElementById('battCost').value = data.battCost;
+        
+        const badgeContainer = document.getElementById('evSpecsContainer');
+        badgeContainer.innerHTML = `
+            <div class="specs-badge">ðŸ›ž Motor: ${data.motor}</div>
+            <div class="specs-badge">ðŸ”‹ Battery: ${data.battery}</div>
+            <div class="specs-badge">ðŸŽï¸ Max Speed: ${data.topSpeed}</div>
+        `;
+        calculate();
+    }
+
+    function calculate() {
+        const evName = document.getElementById('evSelector').options[document.getElementById('evSelector').selectedIndex].text;
+        
+        const baseEvCost = parseFloat(document.getElementById('evOnRoad').value) || 0;
+        const basePetrolCost = parseFloat(document.getElementById('petrolOnRoad').value) || 0;
+
+        const evRange = parseFloat(document.getElementById('evRange').value) || 1;
+        const evKwh = parseFloat(document.getElementById('evKwh').value) || 0;
+        const elecPrice = parseFloat(document.getElementById('elecPrice').value) || 0;
+        const evMaint = parseFloat(document.getElementById('evMaint').value) || 0;
+        
+        const evWarYears = parseFloat(document.getElementById('evWarYears').value) || 0;
+        const evWarKm = parseFloat(document.getElementById('evWarKm').value) || 0;
+        const battCost = parseFloat(document.getElementById('battCost').value) || 0;
+
+        const petrolMileage = parseFloat(document.getElementById('petrolMileage').value) || 1;
+        const petrolCostLtr = parseFloat(document.getElementById('petrolCostLtr').value) || 0;
+        const oilInterval = parseFloat(document.getElementById('oilInterval').value) || 1;
+        const oilCost = parseFloat(document.getElementById('oilCost').value) || 0;
+        const petrolMaint = parseFloat(document.getElementById('petrolMaint').value) || 0;
+        
+        const petWarYears = parseFloat(document.getElementById('petWarYears').value) || 0;
+        const petWarKm = parseFloat(document.getElementById('petWarKm').value) || 0;
+
+        const dailyKm = parseFloat(document.getElementById('dailyKm').value) || 0;
+        const years = parseInt(document.getElementById('years').value) || 14;
+
+        const annualDistance = dailyKm * 365;
+        const annualEvRunning = (annualDistance / evRange) * evKwh * elecPrice + evMaint;
+        const annualPetrolRunning = ((annualDistance / petrolMileage) * petrolCostLtr) + petrolMaint + ((annualDistance / oilInterval) * oilCost);
+
+        let labels = [];
+        let evData = [];
+        let petrolData = [];
+        let tableHTML = "";
+        let breakEvenYearStr = "Never";
+        let foundBreakEven = false;
+        
+        document.querySelector('th:nth-child(5)').innerText = evName + " Cost";
+
+        for (let i = 0; i <= years; i++) {
+            const currentOdo = i * annualDistance;
+            labels.push("Year " + i);
+            
+            // Smart rolling battery logic handles out-of-warranty milestones cleanly
+            let batteryReplacementsCount = Math.floor(currentOdo / evWarKm);
+            let currentEvTco = baseEvCost + (i * annualEvRunning) + (batteryReplacementsCount * battCost);
+            let currentPetrolTco = basePetrolCost + (i * annualPetrolRunning);
+
+            evData.push(currentEvTco);
+            petrolData.push(currentPetrolTco);
+
+            if (!foundBreakEven && i > 0 && currentEvTco < currentPetrolTco) {
+                let prevEv = evData[i-1], prevPet = petrolData[i-1];
+                let fraction = (prevEv - prevPet) / ((currentPetrolTco - prevPet) - (currentEvTco - prevEv));
+                breakEvenYearStr = ((i - 1) + fraction).toFixed(1) + " Years";
+                foundBreakEven = true;
+            }
+
+            let diff = currentPetrolTco - currentEvTco;
+            let badge = diff >= 0 
+                ? `<span style='color: var(--ev-color); font-weight:bold;'>Saves ${formatCurrency(diff)}</span>` 
+                : `<span style='color: #d32f2f;'>Premium: ${formatCurrency(Math.abs(diff))}</span>`;
+                
+            let evWarrantyBadge = (i <= evWarYears && currentOdo <= evWarKm) || i === 0
+                ? `<span class="warranty-in">In Warranty</span>` 
+                : `<span class="warranty-out">Out of Warranty</span>`;
+                
+            let petWarrantyBadge = (i <= petWarYears && currentOdo <= petWarKm) || i === 0
+                ? `<span class="warranty-in">In Warranty</span>` 
+                : `<span class="warranty-out">Out of Warranty</span>`;
+
+            tableHTML += `<tr>
+                <td>Year ${i}</td>
+                <td>${currentOdo.toLocaleString()} km</td>
+                <td style="text-align:center;">${evWarrantyBadge}</td>
+                <td style="text-align:center;">${petWarrantyBadge}</td>
+                <td>${formatCurrency(currentEvTco)}</td>
+                <td>${formatCurrency(currentPetrolTco)}</td>
+                <td>${badge}</td>
+            </tr>`;
+        }
+
+        let netSavings = petrolData[years] - evData[years];
+        document.getElementById('valTotalEV').innerText = formatCurrency(evData[years]);
+        document.getElementById('valTotalPetrol').innerText = formatCurrency(petrolData[years]);
+        document.getElementById('valBreakEven').innerText = breakEvenYearStr;
+        
+        let savingsEl = document.getElementById('valNetSavings');
+        savingsEl.innerText = (netSavings >= 0 ? "" : "-") + formatCurrency(Math.abs(netSavings));
+        savingsEl.style.color = netSavings >= 0 ? "var(--ev-color)" : "#d32f2f";
+        
+        document.getElementById('tableBody').innerHTML = tableHTML;
+        updateChart(labels, evData, petrolData, evName);
+    }
+
+    function updateChart(labels, evData, petrolData, evName) {
+        const ctx = document.getElementById('tcoChart').getContext('2d');
+        if (tcoChart) tcoChart.destroy();
+        tcoChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [
+                    { label: evName, data: evData, borderColor: '#00c853', backgroundColor: 'rgba(0, 200, 83, 0.05)', borderWidth: 3, fill: true, tension: 0.1 },
+                    { label: 'Yamaha RayZR TCO', data: petrolData, borderColor: '#2962ff', backgroundColor: 'transparent', borderWidth: 3, borderDash: [5, 5], tension: 0.1 }
+                ]
+            },
+            options: { responsive: true, maintainAspectRatio: false, scales: { y: { ticks: { callback: function(value) { return 'â‚¹ ' + (value/1000) + 'k'; } } } } }
+        });
+    }
+
+    window.onload = loadEV; 
+</script>
+</body>
+</html>
