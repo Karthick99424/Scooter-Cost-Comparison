@@ -86,7 +86,7 @@
     <div class="summary-grid">
         <div class="stat-card">
             <h3>Net Lifetime Savings</h3>
-            <div class="value" id="valNetSavings" style="color: var(--ev-color);">Ã¢Â‚Â¹0</div>
+            <div class="value" id="valNetSavings" style="color: var(--ev-color);">&#8377;0</div>
         </div>
         <div class="stat-card">
             <h3>Break-Even Point</h3>
@@ -94,22 +94,22 @@
         </div>
         <div class="stat-card">
             <h3>Total EV Outlay</h3>
-            <div class="value" id="valTotalEV" style="color: var(--ev-color);">Ã¢Â‚Â¹0</div>
+            <div class="value" id="valTotalEV" style="color: var(--ev-color);">&#8377;0</div>
         </div>
         <div class="stat-card">
             <h3>Total Petrol Outlay</h3>
-            <div class="value" id="valTotalPetrol" style="color: var(--petrol-color);">Ã¢Â‚Â¹0</div>
+            <div class="value" id="valTotalPetrol" style="color: var(--petrol-color);">&#8377;0</div>
         </div>
     </div>
 
     <div class="grid">
         <!-- EV CARD -->
         <div class="card">
-            <h2 class="ev-header" id="evNameHeader">Ã¢ÂšÂ¡ EV Settings</h2>
+            <h2 class="ev-header" id="evNameHeader">&#9889; EV Settings</h2>
             <div class="specs-badge-container" id="evSpecsContainer"></div>
             
             <div class="itemized-section">
-                <div class="itemized-title">Total On-Road Cost (Ã¢Â‚Â¹)</div>
+                <div class="itemized-title">Total On-Road Cost (&#8377;)</div>
                 <div class="input-container"><div class="input-group"><label>Final On-Road Price</label><div class="input-wrapper"><input type="number" id="evOnRoad" oninput="calculate()"></div></div></div>
             </div>
             
@@ -117,32 +117,32 @@
                 <div class="itemized-title">Running Specs & Power</div>
                 <div class="input-container"><div class="input-group"><label>Real City Range (km)</label><div class="input-wrapper"><input type="number" id="evRange" oninput="calculate()"></div></div></div>
                 <div class="input-container"><div class="input-group"><label>Energy / Charge (kWh)</label><div class="input-wrapper"><input type="number" id="evKwh" step="0.1" oninput="calculate()"></div></div></div>
-                <div class="input-container"><div class="input-group"><label>Electricity Rate (Ã¢Â‚Â¹/kWh)</label><div class="input-wrapper"><input type="number" id="elecPrice" value="8" step="0.1" oninput="calculate()"></div></div></div>
-                <div class="input-container"><div class="input-group"><label>Yearly Base Maint. (Ã¢Â‚Â¹)</label><div class="input-wrapper"><input type="number" id="evMaint" value="3500" oninput="calculate()"></div></div></div>
+                <div class="input-container"><div class="input-group"><label>Electricity Rate (&#8377;/kWh)</label><div class="input-wrapper"><input type="number" id="elecPrice" value="8" step="0.1" oninput="calculate()"></div></div></div>
+                <div class="input-container"><div class="input-group"><label>Yearly Base Maint. (&#8377;)</label><div class="input-wrapper"><input type="number" id="evMaint" value="3500" oninput="calculate()"></div></div></div>
             </div>
             
             <div class="itemized-section">
                 <div class="itemized-title">Warranty & Battery Lifecycles</div>
                 <div class="input-container"><div class="input-group"><label>Extended Warranty (Years)</label><div class="input-wrapper"><input type="number" id="evWarYears" oninput="calculate()"></div></div></div>
                 <div class="input-container"><div class="input-group"><label>Extended Warranty (km)</label><div class="input-wrapper"><input type="number" id="evWarKm" oninput="calculate()"></div></div></div>
-                <div class="input-container"><div class="input-group"><label>New Battery Cost (Ã¢Â‚Â¹)</label><div class="input-wrapper"><input type="number" id="battCost" oninput="calculate()"></div></div></div>
+                <div class="input-container"><div class="input-group"><label>New Battery Cost (&#8377;)</label><div class="input-wrapper"><input type="number" id="battCost" oninput="calculate()"></div></div></div>
             </div>
         </div>
 
         <!-- PETROL CARD -->
         <div class="card">
-            <h2 class="petrol-header">Ã¢Â›Â½ Petrol Settings (Yamaha RayZR)</h2>
+            <h2 class="petrol-header">&#9981; Petrol Settings (Yamaha RayZR)</h2>
             <div class="itemized-section">
-                <div class="itemized-title">Total On-Road Cost (Ã¢Â‚Â¹)</div>
+                <div class="itemized-title">Total On-Road Cost (&#8377;)</div>
                 <div class="input-container"><div class="input-group"><label>Final On-Road Price</label><div class="input-wrapper"><input type="number" id="petrolOnRoad" value="107437" oninput="calculate()"></div></div></div>
             </div>
             <div class="itemized-section">
                 <div class="itemized-title">Running & Fluid Maintenance</div>
                 <div class="input-container"><div class="input-group"><label>Real City Mileage (kmpl)</label><div class="input-wrapper"><input type="number" id="petrolMileage" value="50" oninput="calculate()"></div></div></div>
-                <div class="input-container"><div class="input-group"><label>Petrol Price (Ã¢Â‚Â¹/L)</label><div class="input-wrapper"><input type="number" id="petrolCostLtr" value="105" oninput="calculate()"></div></div></div>
+                <div class="input-container"><div class="input-group"><label>Petrol Price (&#8377;/L)</label><div class="input-wrapper"><input type="number" id="petrolCostLtr" value="105" oninput="calculate()"></div></div></div>
                 <div class="input-container"><div class="input-group"><label>Oil Change Interval (km)</label><div class="input-wrapper"><input type="number" id="oilInterval" value="2500" oninput="calculate()"></div></div></div>
-                <div class="input-container"><div class="input-group"><label>Cost per Oil Change (Ã¢Â‚Â¹)</label><div class="input-wrapper"><input type="number" id="oilCost" value="450" oninput="calculate()"></div></div></div>
-                <div class="input-container"><div class="input-group"><label>Other Maint. / Year (Ã¢Â‚Â¹)</label><div class="input-wrapper"><input type="number" id="petrolMaint" value="4000" oninput="calculate()"></div></div></div>
+                <div class="input-container"><div class="input-group"><label>Cost per Oil Change (&#8377;)</label><div class="input-wrapper"><input type="number" id="oilCost" value="450" oninput="calculate()"></div></div></div>
+                <div class="input-container"><div class="input-group"><label>Other Maint. / Year (&#8377;)</label><div class="input-wrapper"><input type="number" id="petrolMaint" value="4000" oninput="calculate()"></div></div></div>
             </div>
             <div class="itemized-section">
                 <div class="itemized-title">Petrol Warranty Rules</div>
@@ -270,14 +270,14 @@
     let tcoChart;
 
     function formatCurrency(num) {
-        return "Ã¢Â‚Â¹ " + Math.round(num).toLocaleString('en-IN');
+        return "&#8377; " + Math.round(num).toLocaleString('en-IN');
     }
 
     function loadEV() {
         const selected = document.getElementById('evSelector').value;
         const data = evDatabase[selected];
         
-        document.getElementById('evNameHeader').innerText = "Ã¢ÂšÂ¡ EV Settings (" + data.name + ")";
+        document.getElementById('evNameHeader').innerText = "&#9889; EV Settings (" + data.name + ")";
         document.getElementById('evOnRoad').value = data.onRoad;
         document.getElementById('evRange').value = data.range;
         document.getElementById('evKwh').value = data.kwh;
@@ -287,9 +287,9 @@
         
         const badgeContainer = document.getElementById('evSpecsContainer');
         badgeContainer.innerHTML = `
-            <div class="specs-badge">Ã°ÂŸÂ›Âž Motor: ${data.motor}</div>
-            <div class="specs-badge">Ã°ÂŸÂ”Â‹ Battery: ${data.battery}</div>
-            <div class="specs-badge">Ã°ÂŸÂÂŽÃ¯Â¸Â Max Speed: ${data.topSpeed}</div>
+            <div class="specs-badge">&#128734; Motor: ${data.motor}</div>
+            <div class="specs-badge">&#128267; Battery: ${data.battery}</div>
+            <div class="specs-badge">&#127950;&#65039; Max Speed: ${data.topSpeed}</div>
         `;
         calculate();
     }
@@ -402,7 +402,7 @@
                     { label: 'Yamaha RayZR TCO', data: petrolData, borderColor: '#2962ff', backgroundColor: 'transparent', borderWidth: 3, borderDash: [5, 5], tension: 0.1 }
                 ]
             },
-            options: { responsive: true, maintainAspectRatio: false, scales: { y: { ticks: { callback: function(value) { return 'Ã¢Â‚Â¹ ' + (value/1000) + 'k'; } } } } }
+            options: { responsive: true, maintainAspectRatio: false, scales: { y: { ticks: { callback: function(value) { return '&#8377; ' + (value/1000) + 'k'; } } } } }
         });
     }
 
